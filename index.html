@@ -225,10 +225,10 @@ footer a{color:var(--terra);text-decoration:none}
 <div class="wl-eyebrow">The waitlist</div>
 <h3 class="wl-h serif">We&rsquo;ll write once, when it&rsquo;s ready.</h3>
 <p class="wl-sub">Settled is with Apple and Google for review. Leave an address and you&rsquo;ll hear the day it goes live &mdash; and get first claim on an early supporter place.</p>
-<form class="wl" id="wl" method="POST" action="__WAITLIST_ENDPOINT__">
+<form class="wl" id="wl" method="POST" action="https://docs.google.com/forms/d/e/1FAIpQLSdwTvyCsfsTumaFrdtELssVnXqiqrcBOQdKMse6s9aOMKNKPg/formResponse" target="_blank">
  <div class="wl-row">
   <label for="wl-email" style="position:absolute;left:-9999px">Email address</label>
-  <input id="wl-email" type="email" name="email" required placeholder="you@example.com" autocomplete="email" inputmode="email">
+  <input id="wl-email" type="email" name="entry.1779763616" required placeholder="you@example.com" autocomplete="email" inputmode="email">
   <button type="submit" class="btn-dark">Tell me when it&rsquo;s out</button>
  </div>
  <input type="text" name="_gotcha" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
@@ -246,16 +246,28 @@ footer a{color:var(--terra);text-decoration:none}
 
 
 <script>
-(function(){var f=document.getElementById('wl'),m=document.getElementById('wl-msg');if(!f)return;
-f.addEventListener('submit',function(e){e.preventDefault();
- if(f.getAttribute('action').indexOf('__WAITLIST_ENDPOINT__')>-1){
-  m.className='wl-msg err';m.textContent='The waitlist isn\u2019t connected yet \u2014 set the form action first.';return;}
- var b=f.querySelector('button'),o=b.textContent;b.disabled=true;b.textContent='Sending\u2026';m.className='wl-msg';m.textContent='';
- fetch(f.action,{method:'POST',body:new FormData(f),headers:{'Accept':'application/json'}})
-  .then(function(r){if(!r.ok)throw 0;f.reset();m.className='wl-msg ok';
-   m.textContent='You\u2019re on the list. We\u2019ll write once, when it\u2019s ready.';b.textContent='Done';})
-  .catch(function(){b.disabled=false;b.textContent=o;m.className='wl-msg err';
-   m.textContent='That didn\u2019t send. Try again, or email support@thesettledapp.com.';});});})();
+(function(){
+ var f=document.getElementById('wl'), m=document.getElementById('wl-msg');
+ if(!f) return;
+ f.addEventListener('submit', function(e){
+  e.preventDefault();
+  if(f.querySelector('.hp') && f.querySelector('.hp').value){ return; }  // bot
+  var b=f.querySelector('button'), o=b.textContent;
+  var addr=f.querySelector('input[type=email]').value;
+  b.disabled=true; b.textContent='Sending\u2026'; m.className='wl-msg'; m.textContent='';
+  var d=new FormData();
+  d.append('entry.1779763616', addr);
+  // Google Forms does not send CORS headers, so the response is opaque by design:
+  // a resolved promise means the request left the browser, which is the most the
+  // page can know. A network failure still lands in catch().
+  fetch(f.action,{method:'POST',mode:'no-cors',body:d})
+   .then(function(){ f.reset(); m.className='wl-msg ok';
+     m.textContent='You\u2019re on the list. We\u2019ll write once, when it\u2019s ready.';
+     b.textContent='Done'; })
+   .catch(function(){ b.disabled=false; b.textContent=o; m.className='wl-msg err';
+     m.textContent='That didn\u2019t send. Try again, or email support@thesettledapp.com.'; });
+ });
+})();
 </script>
 </body>
 </html>
