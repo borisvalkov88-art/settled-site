@@ -24,12 +24,6 @@
       a.replaceWith(notice);
       return;
     }
-    a.addEventListener('click', () => {
-      if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl) return;
-      const body = JSON.stringify({source,medium,campaign,store,placement:a.dataset.placement});
-      fetch('https://us-central1-mindmatch-8d02d.cloudfunctions.net/settledStoreClick', {
-        method:'POST',headers:{'Content-Type':'application/json'},body,keepalive:true,credentials:'omit'
-      }).catch(() => {});
-    });
+    // Aggregate click collection is paused pending the policy review.
   });
 })();
