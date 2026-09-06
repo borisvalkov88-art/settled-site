@@ -1,7 +1,7 @@
 (() => {
   const params = new URLSearchParams(location.search);
   // Enable only after Apple's public listing is verified reachable.
-  const iosLive = false;
+  const iosLive = true; // App Store listing verified live 6 Sep 2026 (HTTP 200, id6806383640)
   const allowedSources = ['tiktok','instagram','youtube','website'];
   const source = allowedSources.includes(params.get('utm_source')) ? params.get('utm_source') : 'website';
   const medium = ['organic','paid','referral'].includes(params.get('utm_medium')) ? params.get('utm_medium') : 'organic';
@@ -19,7 +19,7 @@
     if (store === 'ios' && !iosLive) {
       const notice = document.createElement('span');
       notice.className = 'store secondary';
-      notice.textContent = 'App Store · rolling out';
+      notice.textContent = 'App Store \u00b7 rolling out';
       notice.setAttribute('role','status');
       a.replaceWith(notice);
       return;
