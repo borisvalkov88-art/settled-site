@@ -29,6 +29,19 @@
       url.searchParams.set('mt', '8');
     }
     a.href = url.toString();
+    // Aggregate store-click counter (re-enabled 13 Sep 2026): a finite set of daily
+    // counters keyed by channel, medium, campaign, store and placement. No cookies,
+    // no visitor identifiers. Do Not Track and Global Privacy Control switch it off.
+    a.addEventListener('click', () => {
+      if (navigator.doNotTrack === '1' || navigator.globalPrivacyControl) return;
+      const countedCampaign = ['settled_ads','website','settled_paid_test','settled_existing_bank','settled_bio'].includes(campaign) ? campaign : 'settled_ads';
+      const countedMedium = ['organic','paid','referral'].includes(medium) ? medium : 'organic';
+      if (source === 'test' || medium === 'test') return;
+      const body = JSON.stringify({source, medium: countedMedium, campaign: countedCampaign, store: a.dataset.store, placement: a.dataset.placement});
+      fetch('https://us-central1-mindmatch-8d02d.cloudfunctions.net/settledStoreClick', {
+        method: 'POST', headers: {'Content-Type': 'application/json'}, body, keepalive: true, credentials: 'omit'
+      }).catch(() => {});
+    });
   });
-  // No cookies, event collection or in-app analytics added by this routing code.
+  // No cookies or in-app analytics added by this routing code.
 })();
